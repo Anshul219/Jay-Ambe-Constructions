@@ -1,0 +1,7 @@
+{
+  "name": "jay-ambe-constructions-root",
+  "private": true,
+  "dependencies": {
+    "web-vitals": "^5.0.3"
+  }
+}
