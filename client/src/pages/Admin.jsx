@@ -1,4 +1,5 @@
 import React from 'react';
+import LoginDebug from '../components/debug/LoginDebug';
 
 const sections = [
   { name: 'Projects', desc: 'Manage all projects', icon: '📁' },
@@ -21,6 +22,11 @@ export default function Admin() {
     <div className="w-full flex flex-col items-center py-16">
       <h2 className="text-4xl font-bold mb-4 text-blue-800">Admin Dashboard</h2>
       <p className="text-lg text-gray-600 max-w-2xl text-center mb-8">Manage projects, content, and inquiries from the admin dashboard.</p>
+      
+      {/* Debug Component */}
+      <div className="w-full max-w-md mb-8">
+        <LoginDebug />
+      </div>
       {/* Stats */}
       <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         {stats.map(stat => (
