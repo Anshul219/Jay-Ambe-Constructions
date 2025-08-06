@@ -1,46 +1,198 @@
 import React from 'react';
+import Logo from './Logo';
 
-export default function Footer() {
+const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
+  const footerLinks = {
+    company: [
+      { name: 'About Us', href: '/about' },
+      { name: 'Our Services', href: '/services' },
+      { name: 'Projects', href: '/projects' },
+      { name: 'Gallery', href: '/gallery' },
+    ],
+    services: [
+      { name: 'Residential Construction', href: '/services' },
+      { name: 'Commercial Construction', href: '/services' },
+      { name: 'Industrial Construction', href: '/services' },
+      { name: 'Renovation & Repair', href: '/services' },
+    ],
+    support: [
+      { name: 'Contact Us', href: '/contact' },
+      { name: 'Get Quote', href: '/contact' },
+      { name: 'Project Consultation', href: '/contact' },
+      { name: 'Support', href: '/contact' },
+    ],
+  };
+
+  const socialLinks = [
+    { name: 'Facebook', icon: '📘', href: '#' },
+    { name: 'Instagram', icon: '📷', href: '#' },
+    { name: 'LinkedIn', icon: '💼', href: '#' },
+    { name: 'YouTube', icon: '📺', href: '#' },
+  ];
+
   return (
-    <footer className="bg-gray-900 dark:bg-gray-950 text-gray-200 dark:text-gray-300 py-10 mt-12 border-t border-gray-800 dark:border-gray-700">
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div>
-          <h2 className="font-bold text-xl mb-4">Jay Ambe Construction</h2>
-          <p className="text-base leading-relaxed">1304, 13TH FLOOR GANESH GLORY,<br />NEAR BSNL OFFICE, JAGATPUR-CHENPUR ROAD,<br />S.G.HIGHWAY, JAGATPUR AHMEDABAD-382481<br />STATE: GUJARAT</p>
-          <p className="text-base mt-3">Email: <a href="mailto:info@jayambeconstruction.com" className="underline hover:text-blue-300 dark:hover:text-yellow-300">info@jayambeconstruction.com</a></p>
+    <footer className="bg-neutral-900 text-neutral-100">
+      {/* Main Footer Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+          {/* Company Info */}
+          <div className="lg:col-span-2">
+            <div className="mb-6">
+              <div className="mb-4">
+                <Logo
+                  className="h-6 w-auto"
+                  clickable={false}
+                />
+              </div>
+              <p className="text-neutral-300 leading-relaxed mb-6 max-w-md">
+                Jay Ambe Construction is a trusted name in the construction industry, 
+                specializing in high-quality residential, commercial, and industrial projects 
+                across Gujarat and Maharashtra.
+              </p>
+            </div>
+            
+            {/* Contact Info */}
+            <div className="space-y-3">
+              <div className="flex items-center text-neutral-300">
+                <span className="mr-3">📍</span>
+                <span>Ahmedabad, Gujarat, India</span>
+              </div>
+              <div className="flex items-center text-neutral-300">
+                <span className="mr-3">📞</span>
+                <span>+91 98765 43210</span>
+              </div>
+              <div className="flex items-center text-neutral-300">
+                <span className="mr-3">✉️</span>
+                <span>info@jayambeconstruction.com</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Company Links */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
+            <ul className="space-y-3">
+              {footerLinks.company.map((link) => (
+                <li key={link.name}>
+                  <a 
+                    href={link.href}
+                    className="text-neutral-300 hover:text-primary-400 transition-colors duration-200"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Services Links */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Services</h3>
+            <ul className="space-y-3">
+              {footerLinks.services.map((link) => (
+                <li key={link.name}>
+                  <a 
+                    href={link.href}
+                    className="text-neutral-300 hover:text-primary-400 transition-colors duration-200"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Support Links */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Support</h3>
+            <ul className="space-y-3">
+              {footerLinks.support.map((link) => (
+                <li key={link.name}>
+                  <a 
+                    href={link.href}
+                    className="text-neutral-300 hover:text-primary-400 transition-colors duration-200"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <div>
-          <h2 className="font-bold text-xl mb-4">Quick Links</h2>
-          <ul className="space-y-2">
-            <li><a href="/" className="text-base hover:underline hover:text-blue-400 dark:hover:text-yellow-300">Home</a></li>
-            <li><a href="/about" className="text-base hover:underline hover:text-blue-400 dark:hover:text-yellow-300">About</a></li>
-            <li><a href="/services" className="text-base hover:underline hover:text-blue-400 dark:hover:text-yellow-300">Services</a></li>
-            <li><a href="/projects" className="text-base hover:underline hover:text-blue-400 dark:hover:text-yellow-300">Projects</a></li>
-            <li><a href="/contact" className="text-base hover:underline hover:text-blue-400 dark:hover:text-yellow-300">Contact</a></li>
-          </ul>
-        </div>
-        <div>
-          <h2 className="font-bold text-xl mb-4">Follow Us</h2>
-          <div className="flex space-x-6 items-center">
-            <a href="https://www.instagram.com/jayambeconstruction?igsh=MW5kbGFkZjAxeTQzMQ==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-pink-400 dark:hover:text-yellow-300 flex items-center text-base">
-              {/* Instagram SVG icon */}
-              <svg className="w-7 h-7 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" stroke="currentColor" strokeWidth="2" fill="none"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg>
-              Instagram
-            </a>
-            <a href="https://www.linkedin.com/company/jay-ambe-construction-04/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-blue-400 dark:hover:text-yellow-300 flex items-center text-base">
-              {/* LinkedIn SVG icon */}
-              <svg className="w-7 h-7 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm15.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
-              LinkedIn
-            </a>
-            <a href="https://www.facebook.com/share/19BFZS4dnL/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-blue-500 dark:hover:text-yellow-300 flex items-center text-base">
-              {/* Facebook SVG icon */}
-              <svg className="w-7 h-7 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.675 0h-21.35C.595 0 0 .592 0 1.326v21.348C0 23.408.595 24 1.326 24h11.495v-9.294H9.691v-3.622h3.13V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.406 24 24 23.408 24 22.674V1.326C24 .592 23.406 0 22.675 0"/></svg>
-              Facebook
-            </a>
+
+        {/* Social Links & Newsletter */}
+        <div className="mt-12 pt-8 border-t border-neutral-700">
+          <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
+            {/* Social Links */}
+            <div className="flex items-center space-x-4">
+              <span className="text-neutral-400 font-medium">Follow us:</span>
+              <div className="flex space-x-3">
+                                 {socialLinks.map((social) => (
+                   <button
+                     key={social.name}
+                     className="w-10 h-10 bg-neutral-800 hover:bg-primary-600 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+                     aria-label={social.name}
+                   >
+                     <span className="text-lg">{social.icon}</span>
+                   </button>
+                 ))}
+              </div>
+            </div>
+
+            {/* Newsletter Signup */}
+            <div className="flex items-center space-x-4">
+              <span className="text-neutral-400 font-medium">Newsletter:</span>
+              <div className="flex">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="px-4 py-2 bg-neutral-800 border border-neutral-700 rounded-l-lg text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                <button className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-r-lg transition-colors duration-200">
+                  Subscribe
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div className="text-center text-gray-400 dark:text-gray-500 mt-10 text-base">© {new Date().getFullYear()} Jay Ambe Construction. All rights reserved.</div>
+
+      {/* Bottom Bar */}
+      <div className="border-t border-neutral-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div className="text-neutral-400 text-sm">
+              © {currentYear} Jay Ambe Construction. All rights reserved.
+            </div>
+                         <div className="flex items-center space-x-6 text-sm text-neutral-400">
+               <button className="hover:text-primary-400 transition-colors duration-200">
+                 Privacy Policy
+               </button>
+               <button className="hover:text-primary-400 transition-colors duration-200">
+                 Terms of Service
+               </button>
+               <button className="hover:text-primary-400 transition-colors duration-200">
+                 Cookie Policy
+               </button>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Back to Top Button */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="fixed bottom-8 right-8 w-12 h-12 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 focus-ring"
+        aria-label="Back to top"
+      >
+        <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+      </button>
     </footer>
   );
-} 
+};
+
+export default Footer; 

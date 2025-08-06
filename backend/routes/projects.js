@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
       status, 
       search, 
       featured,
-      active = true 
+      active = true  // This defaults to only showing active projects
     } = req.query;
 
     const query = {};
@@ -38,7 +38,7 @@ router.get('/', async (req, res) => {
     if (active !== undefined) {
       query.isActive = active === 'true';
     }
-
+    
     // Search functionality
     if (search) {
       query.$text = { $search: search };
@@ -329,4 +329,4 @@ router.get('/stats/overview', auth, async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

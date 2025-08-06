@@ -1,3 +1,291 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Base Styles */
+@layer base {
+  * {
+    @apply border-neutral-200 dark:border-neutral-700;
+  }
+
+  html {
+    @apply scroll-smooth;
+    color-scheme: dark; /* Default to dark color scheme */
+  }
+
+  body {
+    @apply bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 font-sans antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  .dark body {
+    @apply bg-neutral-900 text-neutral-100;
+    color-scheme: dark;
+  }
+  
+  /* High-definition logo optimization */
+  .logo-hd {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    will-change: transform;
+  }
+  
+  /* Ensure logo is always visible and crisp */
+  .logo-container img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  
+  /* Dark mode logo adjustments */
+  .dark .logo-container img {
+    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.1));
+  }
+  
+  /* Logo hover effects */
+  .logo-container:hover img {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+  }
+  
+  .dark .logo-container:hover img {
+    filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.15));
+  }
+}
+
+/* Component Styles */
+@layer components {
+  /* Button Components */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-sm hover:shadow-md;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500 shadow-sm hover:shadow-md;
+  }
+  
+  .btn-outline {
+    @apply border border-primary-600 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 focus:ring-primary-500;
+  }
+  
+  .btn-ghost {
+    @apply text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 focus:ring-neutral-500;
+  }
+  
+  /* Card Components */
+  .card {
+    @apply bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 transition-all duration-200;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-md hover:scale-[1.02] hover:border-primary-200 dark:hover:border-primary-700;
+  }
+  
+  /* Form Components */
+  .form-input {
+    @apply w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors;
+  }
+  
+  .form-select {
+    @apply w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors;
+  }
+  
+  .form-textarea {
+    @apply w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors;
+    resize: vertical;
+  }
+  
+  /* Badge Components */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200;
+  }
+  
+  .badge-secondary {
+    @apply bg-secondary-100 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-200;
+  }
+  
+  .badge-accent {
+    @apply bg-accent-100 text-accent-800 dark:bg-accent-900 dark:text-accent-200;
+  }
+  
+  .badge-neutral {
+    @apply bg-neutral-100 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-200;
+  }
+  
+  /* Focus Ring Utility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900;
+  }
+}
+
+/* Utility Styles */
+@layer utilities {
+  /* Text Gradients */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent;
+  }
+  
+  /* Background Gradients */
+  .gradient-hero {
+    @apply bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-primary-900/20 dark:via-neutral-900 dark:to-secondary-900/20;
+  }
+  
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900 dark:to-primary-800;
+  }
+  
+  .gradient-secondary {
+    @apply bg-gradient-to-br from-secondary-100 to-secondary-200 dark:from-secondary-900 dark:to-secondary-800;
+  }
+  
+  /* Glassmorphism Effect */
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+  
+  /* Responsive Text */
+  .text-responsive {
+    @apply text-sm sm:text-base lg:text-lg;
+  }
+  
+  .text-responsive-2xl {
+    @apply text-xl sm:text-2xl lg:text-3xl;
+  }
+  
+  .text-responsive-3xl {
+    @apply text-2xl sm:text-3xl lg:text-4xl xl:text-5xl;
+  }
+  
+  /* Shadows */
+  .shadow-medium {
+    @apply shadow-lg;
+  }
+  
+  .shadow-large {
+    @apply shadow-xl;
+  }
+  
+  /* Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.4s ease-out;
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  /* Loading States */
+  .loading {
+    @apply animate-pulse bg-neutral-200 dark:bg-neutral-700;
+  }
+  
+  /* Hover Effects */
+  .hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-1;
+  }
+  
+  .hover-glow {
+    @apply transition-shadow duration-200 hover:shadow-lg hover:shadow-primary-500/25;
+  }
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Custom Scrollbar */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.neutral.300') transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: theme('colors.neutral.300');
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: theme('colors.neutral.400');
+  }
+  
+  .dark .scrollbar-thin {
+    scrollbar-color: theme('colors.neutral.600') transparent;
+  }
+  
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: theme('colors.neutral.600');
+  }
+  
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: theme('colors.neutral.500');
+  }
+}

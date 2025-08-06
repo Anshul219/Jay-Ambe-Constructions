@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
@@ -50,6 +51,13 @@ const LoginForm = () => {
           <p className="mt-1 text-center text-xs sm:text-sm text-gray-600 dark:text-gray-300">
             Jay Ambe Constructions
           </p>
+          <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <p className="text-xs text-blue-700 dark:text-blue-300 text-center">
+              <strong>Default Login:</strong><br />
+              Email: admin@jayambeconstructions.com<br />
+              Password: admin123
+            </p>
+          </div>
         </div>
         
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>

@@ -1,44 +1,364 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function Contact() {
+const Contact = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    projectType: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate form submission
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        projectType: '',
+        message: ''
+      });
+      alert('Thank you for your message! We will get back to you soon.');
+    }, 2000);
+  };
+
+  const contactInfo = [
+    {
+      icon: '📍',
+      title: 'Address',
+      details: '1304, 13TH FLOOR GANESH GLORY, NEAR BSNL OFFICE, JAGATPUR-CHENPUR ROAD, S.G.HIGHWAY, JAGATPUR AHMEDABAD-382481, GUJARAT'
+    },
+    {
+      icon: '📞',
+      title: 'Phone',
+      details: '+91 98765 43210'
+    },
+    {
+      icon: '✉️',
+      title: 'Email',
+      details: 'info@jayambeconstruction.com'
+    },
+    {
+      icon: '🕒',
+      title: 'Business Hours',
+      details: 'Monday - Friday: 9:00 AM - 6:00 PM\nSaturday: 9:00 AM - 2:00 PM'
+    }
+  ];
+
+  const projectTypes = [
+    'Residential Construction',
+    'Commercial Construction',
+    'Industrial Construction',
+    'Renovation & Repair',
+    'Consultation',
+    'Other'
+  ];
+
   return (
-    <div className="w-full flex flex-col items-center py-16">
-      <h2 className="text-4xl font-bold mb-4 text-blue-800 dark:text-yellow-300">Contact Us</h2>
-      <p className="text-lg text-gray-600 dark:text-gray-200 max-w-2xl text-center mb-8">Get in touch for inquiries, quotes, or to discuss your next project.</p>
-      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className={`min-h-screen transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+      {/* Hero Section */}
+      <section className="relative py-20 lg:py-32 gradient-hero overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-72 h-72 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+          <div className="absolute top-40 right-20 w-96 h-96 bg-secondary-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style={{ animationDelay: '1s' }}></div>
+        </div>
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center animate-fade-in">
+            <h1 className="text-responsive-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">
+              Get in <span className="text-gradient">Touch</span>
+            </h1>
+            <p className="text-responsive text-neutral-700 dark:text-neutral-300 max-w-4xl mx-auto leading-relaxed">
+              Ready to start your next construction project? We're here to help bring your vision to life. 
+              Contact us for a free consultation and quote.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Form & Info */}
+      <section className="py-20 bg-white dark:bg-neutral-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Contact Form */}
-        <form className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-8 flex flex-col gap-4">
-          <input type="text" placeholder="Name" className="border border-gray-300 dark:border-gray-700 rounded px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
-          <input type="email" placeholder="Email" className="border border-gray-300 dark:border-gray-700 rounded px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
-          <input type="tel" placeholder="Phone" className="border border-gray-300 dark:border-gray-700 rounded px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
-          <input type="text" placeholder="Project Type" className="border border-gray-300 dark:border-gray-700 rounded px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
-          <textarea placeholder="Message" className="border border-gray-300 dark:border-gray-700 rounded px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" rows={3} />
-          <button type="submit" className="bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 dark:bg-yellow-400 dark:text-gray-900 dark:hover:bg-yellow-500 transition">Send</button>
+            <div className="animate-slide-up">
+              <h2 className="text-responsive-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">
+                Send Us a Message
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="form-input"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="form-input"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                      Project Type
+                    </label>
+                    <select
+                      name="projectType"
+                      value={formData.projectType}
+                      onChange={handleInputChange}
+                      className="form-select"
+                    >
+                      <option value="">Select project type</option>
+                      {projectTypes.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    Message *
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
+                    rows={6}
+                    className="form-textarea"
+                    placeholder="Tell us about your project requirements..."
+                  />
+                </div>
+                
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn btn-primary w-full text-responsive"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending Message...
+                    </>
+                  ) : (
+                    'Send Message'
+                  )}
+                </button>
         </form>
-        {/* Company Info & Map */}
-        <div className="flex flex-col gap-4 justify-center">
-          <div className="bg-blue-50 dark:bg-gray-900 rounded-lg p-6">
-            <h3 className="font-bold text-blue-800 dark:text-yellow-300 mb-2">Jay Ambe Construction</h3>
-            <p className="text-gray-700 dark:text-gray-200">1304, 13TH FLOOR GANESH GLORY,<br />NEAR BSNL OFFICE, JAGATPUR-CHENPUR ROAD,<br />S.G.HIGHWAY, JAGATPUR AHMEDABAD-382481<br />STATE: GUJARAT</p>
-            <p className="text-gray-700 dark:text-gray-200">Email: <a href="mailto:info@jayambeconstruction.com" className="underline hover:text-blue-700 dark:hover:text-yellow-300">info@jayambeconstruction.com</a></p>
-            <div className="flex space-x-4 mt-4">
-              <a href="https://www.instagram.com/jayambeconstruction?igsh=MW5kbGFkZjAxeTQzMQ==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-pink-500 dark:hover:text-yellow-300 flex items-center">
-                <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" stroke="currentColor" strokeWidth="2" fill="none"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg>
-                Instagram
-              </a>
-              <a href="https://www.linkedin.com/company/jay-ambe-construction-04/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-blue-500 dark:hover:text-yellow-300 flex items-center">
-                <svg className="w-6 h-6 mr-1" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm15.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
-                LinkedIn
-              </a>
-              <a href="https://www.facebook.com/share/19BFZS4dnL/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-blue-700 dark:hover:text-yellow-300 flex items-center">
-                <svg className="w-6 h-6 mr-1" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.675 0h-21.35C.595 0 0 .592 0 1.326v21.348C0 23.408.595 24 1.326 24h11.495v-9.294H9.691v-3.622h3.13V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.406 24 24 23.408 24 22.674V1.326C24 .592 23.406 0 22.675 0"/></svg>
-                Facebook
-              </a>
+            </div>
+            
+            {/* Contact Information */}
+            <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              <h2 className="text-responsive-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">
+                Contact Information
+              </h2>
+              <div className="space-y-6">
+                {contactInfo.map((info, index) => (
+                  <div 
+                    key={info.title} 
+                    className="flex items-start space-x-4 animate-scale-in"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl">{info.icon}</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+                        {info.title}
+                      </h3>
+                      <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                        {info.details}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Social Links */}
+              <div className="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-700">
+                <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
+                  Follow Us
+                </h3>
+                                 <div className="flex space-x-4">
+                   <button className="w-10 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center transition-colors">
+                     <span className="text-white text-lg">📘</span>
+                   </button>
+                   <button className="w-10 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center transition-colors">
+                     <span className="text-white text-lg">📷</span>
+                   </button>
+                   <button className="w-10 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center transition-colors">
+                     <span className="text-white text-lg">💼</span>
+                   </button>
+                   <button className="w-10 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center transition-colors">
+                     <span className="text-white text-lg">📺</span>
+                   </button>
+                 </div>
+              </div>
             </div>
           </div>
-          <div className="bg-gray-200 dark:bg-gray-800 rounded-lg h-40 flex items-center justify-center text-gray-500 dark:text-gray-300">Map Placeholder</div>
+        </div>
+      </section>
+
+      {/* Map Section */}
+      <section className="py-20 bg-neutral-50 dark:bg-neutral-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-responsive-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
+              Find Us
+            </h2>
+            <p className="text-responsive text-neutral-700 dark:text-neutral-300 max-w-2xl mx-auto">
+              Visit our office or get in touch with us for any inquiries
+            </p>
+          </div>
+          
+          <div className="card animate-fade-in">
+            <div className="p-8">
+              <div className="aspect-video bg-neutral-200 dark:bg-neutral-700 rounded-lg flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-6xl mb-4">🗺️</div>
+                  <p className="text-neutral-600 dark:text-neutral-400">
+                    Interactive Map Coming Soon
+                  </p>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-500 mt-2">
+                    We're working on adding an interactive map to help you find us easily
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 bg-white dark:bg-neutral-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-responsive-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-responsive text-neutral-700 dark:text-neutral-300">
+              Common questions about our services and process
+            </p>
+          </div>
+          
+          <div className="space-y-6">
+            {[
+              {
+                question: 'What types of projects do you handle?',
+                answer: 'We handle a wide range of construction projects including residential, commercial, and industrial buildings. From single-family homes to high-rise complexes, we have the expertise to deliver quality results.'
+              },
+              {
+                question: 'How long does a typical project take?',
+                answer: 'Project timelines vary depending on the scope and complexity. A small residential project might take 3-6 months, while larger commercial projects can take 12-24 months. We provide detailed timelines during consultation.'
+              },
+              {
+                question: 'Do you provide free consultations?',
+                answer: 'Yes, we offer free initial consultations to discuss your project requirements, budget, and timeline. This helps us understand your vision and provide accurate estimates.'
+              },
+              {
+                question: 'What areas do you serve?',
+                answer: 'We primarily serve Gujarat and Maharashtra, with our main office in Ahmedabad. We can handle projects throughout these regions and are expanding our service areas.'
+              }
+            ].map((faq, index) => (
+              <div 
+                key={index} 
+                className="card animate-slide-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-3">
+                    {faq.question}
+                  </h3>
+                  <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                    {faq.answer}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 gradient-secondary">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-responsive-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">
+            Ready to Start Your Project?
+          </h2>
+          <p className="text-responsive text-neutral-700 dark:text-neutral-300 mb-8 max-w-2xl mx-auto">
+            Don't wait any longer. Contact us today and let's discuss how we can help 
+            bring your construction vision to life.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="btn btn-primary text-responsive">
+              Get Free Quote
+            </button>
+            <button className="btn btn-outline text-responsive">
+              Schedule Consultation
+            </button>
         </div>
       </div>
+      </section>
     </div>
   );
-} 
+};
+
+export default Contact; 
