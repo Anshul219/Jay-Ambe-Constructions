@@ -33,23 +33,6 @@ const services = [
   },
 ];
 
-const testimonials = [
-  { 
-    name: 'Amit Shah', 
-    role: 'Residential Client',
-    text: 'Jay Ambe Construction delivered our dream home on time and with top quality! The attention to detail was exceptional.',
-    rating: 5,
-    avatar: '👨‍💼'
-  },
-  { 
-    name: 'Priya Patel', 
-    role: 'Commercial Client',
-    text: 'Professional, transparent, and reliable. They transformed our vision into reality with outstanding craftsmanship.',
-    rating: 5,
-    avatar: '👩‍💼'
-  },
-];
-
 export default function Home() {
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -86,59 +69,84 @@ export default function Home() {
 
   const fetchFeaturedProjects = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/projects?status=Completed&limit=6&featured=true');
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/api/projects?featured=true&limit=6&active=true');
       const data = await response.json();
       
-      if (data.success && data.data.length > 0) {
+      if (data.success && data.data && data.data.length > 0) {
+        console.log('Fetched projects:', data.data);
         setFeaturedProjects(data.data);
       } else {
-        console.error('Failed to fetch projects:', data.message);
+        console.log('No featured projects found, using fallback data');
         // Fallback to default completed projects
         setFeaturedProjects([
           { 
-            name: 'Skyline Heights', 
-            description: 'Luxury residential apartments with modern amenities and world-class facilities',
-            images: [{ url: 'https://via.placeholder.com/400x300/4F46E5/FFFFFF?text=Skyline+Heights' }],
-            status: 'Completed',
-            category: 'Residential',
-            location: 'Mumbai, Maharashtra',
-            specifications: { area: 25000 },
-            endDate: '2024-01-15'
-          },
-          { 
-            name: 'Tech Park Complex', 
-            description: 'Modern office complex with state-of-the-art facilities and smart building technology',
-            images: [{ url: 'https://via.placeholder.com/400x300/10B981/FFFFFF?text=Tech+Park' }],
-            status: 'Completed',
-            category: 'Commercial',
-            location: 'Pune, Maharashtra',
-            specifications: { area: 50000 },
-            endDate: '2023-12-20'
-          },
-          { 
             name: 'Green Valley Township', 
-            description: 'Eco-friendly residential township with sustainable design and green spaces',
-            images: [{ url: 'https://via.placeholder.com/400x300/F59E0B/FFFFFF?text=Green+Valley' }],
+            description: 'Eco-friendly residential township with sustainable design and green spaces. A modern community with 200+ units featuring smart building technology.',
+            images: [{ url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800' }],
             status: 'Completed',
             category: 'Residential',
             location: 'Nashik, Maharashtra',
             specifications: { area: 100000 },
-            endDate: '2023-11-10'
+            isFeatured: true
           },
           { 
-            name: 'Industrial Hub', 
-            description: 'State-of-the-art manufacturing facility with advanced automation systems',
-            images: [{ url: 'https://via.placeholder.com/400x300/EF4444/FFFFFF?text=Industrial+Hub' }],
+            name: 'Skyline Heights Complex', 
+            description: 'Luxury residential apartments with state-of-the-art facilities and smart building technology. Premium living experience in the heart of Ahmedabad.',
+            images: [{ url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800' }],
+            status: 'In Progress',
+            category: 'Residential',
+            location: 'Ahmedabad, Gujarat',
+            specifications: { area: 50000 },
+            isFeatured: true
+          },
+          { 
+            name: 'Tech Park Commercial Hub', 
+            description: 'Modern commercial complex with office spaces, retail areas, and conference facilities. Perfect for businesses and startups.',
+            images: [{ url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800' }],
+            status: 'In Progress',
+            category: 'Commercial',
+            location: 'Mumbai, Maharashtra',
+            specifications: { area: 75000 },
+            isFeatured: true
+          },
+          { 
+            name: 'Industrial Manufacturing Unit', 
+            description: 'Large-scale industrial facility with advanced manufacturing capabilities, warehouse space, and logistics support.',
+            images: [{ url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800' }],
             status: 'Completed',
             category: 'Industrial',
-            location: 'Ahmedabad, Gujarat',
-            specifications: { area: 75000 },
-            endDate: '2023-10-15'
+            location: 'Surat, Gujarat',
+            specifications: { area: 50000 },
+            isFeatured: true
           },
         ]);
       }
     } catch (error) {
       console.error('Error fetching projects:', error);
+      // Use fallback data on error
+      setFeaturedProjects([
+        { 
+          name: 'Green Valley Township', 
+          description: 'Eco-friendly residential township with sustainable design and green spaces.',
+          images: [{ url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800' }],
+          status: 'Completed',
+          category: 'Residential',
+          location: 'Nashik, Maharashtra',
+          specifications: { area: 100000 },
+          isFeatured: true
+        },
+        { 
+          name: 'Skyline Heights Complex', 
+          description: 'Luxury residential apartments with modern amenities.',
+          images: [{ url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800' }],
+          status: 'In Progress',
+          category: 'Residential',
+          location: 'Ahmedabad, Gujarat',
+          specifications: { area: 50000 },
+          isFeatured: true
+        }
+      ]);
     } finally {
       setLoading(false);
     }
@@ -199,10 +207,16 @@ export default function Home() {
               We combine quality craftsmanship with innovative solutions to deliver exceptional results.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <button className="btn btn-primary text-responsive">
+              <button 
+                onClick={() => window.location.href = '/contact'}
+                className="btn btn-primary text-responsive"
+              >
                 Get Free Quote
               </button>
-              <button className="btn btn-outline text-responsive">
+              <button 
+                onClick={() => window.location.href = '/projects'}
+                className="btn btn-outline text-responsive"
+              >
                 View Our Projects
               </button>
             </div>
@@ -294,12 +308,17 @@ export default function Home() {
                   <div key={index} className="card card-hover min-w-[400px] flex-shrink-0 animate-fade-in">
                   {/* Project Image */}
                     <div className="relative h-64 bg-neutral-200 dark:bg-neutral-700 overflow-hidden">
-                    <img 
-                      src={project.images && project.images.length > 0 ? project.images[0].url : project.image} 
+                    <img
+                      src={project.images && project.images.length > 0 
+                        ? project.images[0].url.startsWith('http') 
+                          ? project.images[0].url 
+                          : `http://localhost:5000${project.images[0].url}`
+                        : `https://via.placeholder.com/600x400/4F46E5/FFFFFF?text=${encodeURIComponent(project.name)}`
+                      }
                       alt={project.name}
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                      className="w-full h-48 object-cover rounded-t-lg"
                       onError={(e) => {
-                        e.target.src = `https://via.placeholder.com/400x300/4F46E5/FFFFFF?text=${encodeURIComponent(project.name)}`;
+                        e.target.src = `https://via.placeholder.com/600x400/4F46E5/FFFFFF?text=${encodeURIComponent(project.name)}`;
                       }}
                     />
                     {/* Status Badge */}
@@ -312,8 +331,8 @@ export default function Home() {
                       <div className="absolute top-4 left-4">
                         <span className="badge badge-secondary">
                           {project.category}
-                        </span>
-                      </div>
+                      </span>
+                    </div>
                   </div>
                   
                   {/* Project Info */}
@@ -358,53 +377,7 @@ export default function Home() {
           >
             View All Projects
           </button>
-          </div>
         </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 bg-white dark:bg-neutral-900">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-responsive-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
-              What Our Clients Say
-            </h2>
-            <p className="text-responsive text-neutral-700 dark:text-neutral-300 max-w-2xl mx-auto">
-              Don't just take our word for it - hear from our satisfied clients
-            </p>
-          </div>
-          
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div 
-                key={testimonial.name} 
-                className="card animate-slide-up"
-                style={{ animationDelay: `${index * 0.2}s` }}
-              >
-                <div className="p-8">
-                  <div className="flex items-center mb-6">
-                    <div className="text-4xl mr-4">{testimonial.avatar}</div>
-                    <div>
-                      <h4 className="font-semibold text-neutral-900 dark:text-neutral-100">
-                        {testimonial.name}
-                      </h4>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                        {testimonial.role}
-                      </p>
-                    </div>
-                    <div className="ml-auto flex">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <span key={i} className="text-yellow-400">⭐</span>
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-neutral-700 dark:text-neutral-300 italic leading-relaxed">
-                    "{testimonial.text}"
-                  </p>
-                </div>
-            </div>
-          ))}
-          </div>
         </div>
       </section>
 
@@ -418,10 +391,16 @@ export default function Home() {
             Let's discuss your vision and turn it into reality. Get in touch with us today for a free consultation.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="btn btn-primary text-responsive">
+            <button 
+              onClick={() => window.location.href = '/contact'}
+              className="btn btn-primary text-responsive"
+            >
               Get Free Consultation
             </button>
-            <button className="btn btn-outline text-responsive">
+            <button 
+              onClick={() => window.location.href = '/contact'}
+              className="btn btn-outline text-responsive"
+            >
               Contact Us
             </button>
           </div>

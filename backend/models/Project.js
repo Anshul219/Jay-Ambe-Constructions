@@ -4,44 +4,73 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 const projectSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
-    trim: true
+    required: [true, 'Project name is required'],
+    trim: true,
+    maxlength: [100, 'Project name cannot exceed 100 characters']
   },
   description: {
     type: String,
-    required: true,
-    trim: true
+    required: [true, 'Project description is required'],
+    trim: true,
+    maxlength: [2000, 'Description cannot exceed 2000 characters']
   },
   category: {
     type: String,
-    required: true,
-    enum: ['Residential', 'Commercial', 'Industrial', 'Renovation', 'Infrastructure'],
+    required: [true, 'Project category is required'],
+    enum: {
+      values: ['Residential', 'Commercial', 'Industrial', 'Renovation', 'Infrastructure'],
+      message: 'Invalid project category'
+    },
     default: 'Residential'
   },
   location: {
     type: String,
-    required: true,
-    trim: true
+    required: [true, 'Project location is required'],
+    trim: true,
+    maxlength: [200, 'Location cannot exceed 200 characters']
   },
   client: {
     type: String,
-    trim: true
+    trim: true,
+    maxlength: [100, 'Client name cannot exceed 100 characters']
   },
   startDate: {
     type: Date,
-    required: true
+    validate: {
+      validator: function(value) {
+        if (!value) return true; // Allow empty/null values
+        return value instanceof Date && !isNaN(value);
+      },
+      message: 'Invalid start date'
+    }
   },
   endDate: {
-    type: Date
+    type: Date,
+    validate: {
+      validator: function(value) {
+        if (!value) return true; // Allow empty/null values
+        return value instanceof Date && !isNaN(value);
+      },
+      message: 'Invalid end date'
+    }
   },
   status: {
     type: String,
-    enum: ['Planning', 'In Progress', 'Completed', 'On Hold'],
+    enum: {
+      values: ['Planning', 'In Progress', 'Completed', 'On Hold'],
+      message: 'Invalid project status'
+    },
     default: 'Planning'
   },
   budget: {
     type: Number,
-    min: 0
+    min: [0, 'Budget cannot be negative'],
+    validate: {
+      validator: function(value) {
+        return !value || (typeof value === 'number' && !isNaN(value));
+      },
+      message: 'Budget must be a valid number'
+    }
   },
   images: [{
     url: {

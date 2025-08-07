@@ -39,7 +39,11 @@ export const AuthProvider = ({ children }) => {
         setAdmin(response.data.admin);
       } catch (error) {
         console.error('Token verification failed:', error);
-        logout();
+        // Clear invalid token
+        localStorage.removeItem('adminToken');
+        setToken(null);
+        setAdmin(null);
+        delete axios.defaults.headers.common['Authorization'];
       } finally {
         setLoading(false);
       }
@@ -53,6 +57,12 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       console.log('Attempting login with:', { email, password });
       
+      // Validate input
+      if (!email || !password) {
+        toast.error('Email and password are required', { duration: 3000 });
+        return { success: false, message: 'Email and password are required' };
+      }
+
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         email,
         password
@@ -65,12 +75,23 @@ export const AuthProvider = ({ children }) => {
       setToken(newToken);
       localStorage.setItem('adminToken', newToken);
       
-      toast.success('Login successful!');
+      toast.success('Login successful!', { duration: 1500 });
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);
-      const message = error.response?.data?.message || 'Login failed';
-      toast.error(message);
+      let message = 'Login failed. Please try again.';
+      
+      if (error.response?.status === 401) {
+        message = 'Invalid email or password';
+      } else if (error.response?.status === 500) {
+        message = 'Server error. Please try again later.';
+      } else if (!error.response) {
+        message = 'Network error. Please check your connection.';
+      } else {
+        message = error.response?.data?.message || message;
+      }
+      
+      toast.error(message, { duration: 3000 });
       return { success: false, message };
     } finally {
       setLoading(false);
@@ -82,18 +103,18 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem('adminToken');
     delete axios.defaults.headers.common['Authorization'];
-    toast.success('Logged out successfully');
+    toast.success('Logged out successfully', { duration: 1500 });
   };
 
   const updateProfile = async (updates) => {
     try {
       const response = await axios.put('http://localhost:5000/api/auth/profile', updates);
       setAdmin(response.data.admin);
-      toast.success('Profile updated successfully');
+      toast.success('Profile updated successfully', { duration: 1500 });
       return { success: true };
     } catch (error) {
       const message = error.response?.data?.message || 'Profile update failed';
-      toast.error(message);
+      toast.error(message, { duration: 3000 });
       return { success: false, message };
     }
   };

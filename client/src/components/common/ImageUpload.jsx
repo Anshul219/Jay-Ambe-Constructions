@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const ImageUpload = ({ 
   images = [], 
@@ -11,6 +12,50 @@ const ImageUpload = ({
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
+  const uploadImages = async (files) => {
+    try {
+      setUploading(true);
+      
+      const formData = new FormData();
+      files.forEach((file, index) => {
+        formData.append('images', file);
+        formData.append('captions', file.name.replace(/\.[^/.]+$/, ""));
+      });
+
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        toast.error('Authentication required');
+        return;
+      }
+
+      const response = await axios.post('http://localhost:5000/api/projects/upload-images', formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.data.success) {
+        const newImages = response.data.data;
+        onImagesChange([...images, ...newImages]);
+        toast.success(response.data.message);
+      } else {
+        toast.error('Failed to upload images');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      if (error.response?.status === 401) {
+        toast.error('Authentication failed. Please login again.');
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Failed to upload images. Please try again.');
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     
@@ -19,18 +64,7 @@ const ImageUpload = ({
       return;
     }
 
-    setUploading(true);
-
-    // Simulate file upload (in real app, upload to server)
-    const newImages = files.map((file, index) => ({
-      url: URL.createObjectURL(file),
-      caption: file.name.replace(/\.[^/.]+$/, ""), // Remove extension
-      isMain: images.length === 0 && index === 0 // First image is main if no images exist
-    }));
-
-    onImagesChange([...images, ...newImages]);
-    setUploading(false);
-    toast.success(`${files.length} image(s) uploaded successfully!`);
+    uploadImages(files);
   };
 
   const removeImage = (index) => {

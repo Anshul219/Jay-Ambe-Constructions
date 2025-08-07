@@ -1,26 +1,30 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { toast } from 'react-hot-toast';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 import ImageUpload from '../components/common/ImageUpload';
-import Logo from '../components/common/Logo';
 
 const ProjectsManagement = () => {
-  const { admin, logout } = useAuth();
+  const { admin, logout, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
+  // Loading states
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [connectionStatus, setConnectionStatus] = useState('checking');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     category: 'Residential',
     location: '',
-    client: '',
-    startDate: '',
-    endDate: '',
     status: 'Planning',
     budget: '',
     images: [],
@@ -34,12 +38,6 @@ const ProjectsManagement = () => {
     isFeatured: false,
     isActive: true
   });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [submitting, setSubmitting] = useState(false);
 
   const categories = ['Residential', 'Commercial', 'Industrial', 'Renovation', 'Infrastructure'];
   const statuses = ['Planning', 'In Progress', 'Completed', 'On Hold'];
@@ -49,67 +47,200 @@ const ProjectsManagement = () => {
     navigate('/admin/login');
   };
 
-  const fetchProjects = useCallback(async () => {
+  const fetchProjects = useCallback(async (retryCount = 0) => {
     try {
       setLoading(true);
-      console.log('Fetching projects with token:', admin.token);
+      
+      // Add timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        setLoading(false);
+        if (retryCount < 2) {
+          toast.error('Request timeout. Retrying...', { duration: 2000 });
+          setTimeout(() => fetchProjects(retryCount + 1), 2000);
+        } else {
+          toast.error('Request timeout. Please check your connection and try again.', { duration: 3000 });
+        }
+      }, 15000); // 15 second timeout
       
       const params = new URLSearchParams({
-        page: currentPage,
-        limit: 10
+        page: currentPage.toString(),
+        limit: '10'
       });
 
       if (searchTerm) params.append('search', searchTerm);
       if (categoryFilter) params.append('category', categoryFilter);
       if (statusFilter) params.append('status', statusFilter);
 
+      // Get current token
+      const currentToken = localStorage.getItem('adminToken');
+      if (!currentToken) {
+        toast.error('Authentication required. Please login again.', { duration: 3000 });
+        logout();
+        navigate('/admin/login');
+        return;
+      }
+
       const response = await axios.get(`http://localhost:5000/api/projects?${params}`, {
-        headers: { Authorization: `Bearer ${admin.token}` }
+        headers: { Authorization: `Bearer ${currentToken}` },
+        timeout: 10000 // 10 second axios timeout
       });
       
+      clearTimeout(timeoutId);
+      
       if (response.data.success) {
-        setProjects(response.data.data);
-        setTotalPages(response.data.pagination.totalPages);
-      }
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      if (error.response?.status === 401) {
-        toast.error('Authentication failed. Please login again.');
+        setProjects(response.data.data || []);
+        setTotalPages(response.data.pagination?.totalPages || 1);
+        console.log('Projects loaded:', response.data.data?.length || 0);
+        if (retryCount > 0) {
+          toast.success('Projects loaded successfully!', { duration: 2000 });
+        }
       } else {
         toast.error('Failed to fetch projects');
       }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      let message = 'Failed to fetch projects';
+      
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        message = 'Request timeout. Please check your connection.';
+        if (retryCount < 2) {
+          setTimeout(() => fetchProjects(retryCount + 1), 2000);
+        }
+      } else if (error.response?.status === 401) {
+        message = 'Authentication failed. Please login again.';
+        logout();
+        navigate('/admin/login');
+      } else if (error.response?.status === 500) {
+        message = 'Server error. Please try again later.';
+      } else if (!error.response) {
+        message = 'Network error. Please check your connection.';
+        if (retryCount < 2) {
+          setTimeout(() => fetchProjects(retryCount + 1), 2000);
+        }
+      } else {
+        message = error.response?.data?.message || message;
+      }
+      
+      toast.error(message, { duration: 3000 });
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchTerm, categoryFilter, statusFilter, admin.token]);
+  }, [currentPage, searchTerm, categoryFilter, statusFilter, logout, navigate]);
 
   useEffect(() => {
-    if (admin.token) {
-      fetchProjects();
-    } else {
-      console.log('No token available, cannot fetch projects');
-      toast.error('Authentication required. Please login.');
+    // Check backend connection
+    fetch('http://localhost:5000')
+      .then(() => setConnectionStatus('connected'))
+      .catch(() => setConnectionStatus('disconnected'));
+  }, []);
+
+  useEffect(() => {
+    // Clear any invalid tokens first
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+      // Test token validity immediately
+      fetch('http://localhost:5000/api/auth/verify', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }).catch(() => {
+        localStorage.removeItem('adminToken');
+        navigate('/admin/login');
+        return;
+      });
     }
-  }, [fetchProjects, admin.token]);
+
+    if (!authLoading && !admin) {
+      navigate('/admin/login');
+      return;
+    }
+    
+    if (admin && admin.token) {
+      fetchProjects();
+    }
+  }, [admin, authLoading, navigate, fetchProjects]);
+
+  // Show loading state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <svg className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-gray-600 dark:text-gray-300">Verifying authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login prompt if not authenticated
+  if (!admin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-red-600 mb-4">
+            <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Authentication Required</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">Please login to access the admin panel.</p>
+          <div className="space-y-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Default credentials:</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Email: admin@jayambeconstructions.com</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Password: admin123</p>
+          </div>
+          <button
+            onClick={() => navigate('/admin/login')}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors mt-4"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Basic validation
+    // Comprehensive validation
+    const errors = [];
+    
     if (!formData.name.trim()) {
-      toast.error('Project name is required');
-      return;
+      errors.push('Project name is required');
     }
     if (!formData.description.trim()) {
-      toast.error('Project description is required');
-      return;
+      errors.push('Project description is required');
     }
     if (!formData.location.trim()) {
-      toast.error('Project location is required');
-      return;
+      errors.push('Project location is required');
     }
-    if (!formData.startDate) {
-      toast.error('Start date is required');
+    if (formData.budget && isNaN(parseFloat(formData.budget))) {
+      errors.push('Budget must be a valid number');
+    }
+    if (formData.specifications.area && isNaN(parseFloat(formData.specifications.area))) {
+      errors.push('Area must be a valid number');
+    }
+    if (formData.specifications.floors && isNaN(parseInt(formData.specifications.floors))) {
+      errors.push('Floors must be a valid number');
+    }
+    if (formData.specifications.units && isNaN(parseInt(formData.specifications.units))) {
+      errors.push('Units must be a valid number');
+    }
+    
+    // Check if images are properly uploaded (not just local URLs)
+    const hasValidImages = formData.images && formData.images.length > 0 && 
+      formData.images.some(img => img.url && !img.url.startsWith('blob:'));
+    
+    if (!hasValidImages) {
+      errors.push('Please upload at least one project image');
+    }
+    
+    if (errors.length > 0) {
+      errors.forEach(error => toast.error(error, { duration: 3000 }));
       return;
     }
     
@@ -125,16 +256,25 @@ const ProjectsManagement = () => {
         }
       };
 
+      // Get current token
+      const currentToken = localStorage.getItem('adminToken');
+      if (!currentToken) {
+        toast.error('Authentication required. Please login again.', { duration: 3000 });
+        logout();
+        navigate('/admin/login');
+        return;
+      }
+
       if (editingProject) {
         await axios.put(`http://localhost:5000/api/projects/${editingProject._id}`, projectData, {
-          headers: { Authorization: `Bearer ${admin.token}` }
+          headers: { Authorization: `Bearer ${currentToken}` }
         });
-        toast.success('Project updated successfully');
+        toast.success('Project updated successfully', { duration: 1500 });
       } else {
         await axios.post('http://localhost:5000/api/projects', projectData, {
-          headers: { Authorization: `Bearer ${admin.token}` }
+          headers: { Authorization: `Bearer ${currentToken}` }
         });
-        toast.success('Project created successfully');
+        toast.success('Project created successfully', { duration: 1500 });
       }
 
       setShowForm(false);
@@ -143,11 +283,23 @@ const ProjectsManagement = () => {
       fetchProjects();
     } catch (error) {
       console.error('Error saving project:', error);
-      if (error.response?.data?.errors) {
-        error.response.data.errors.forEach(err => toast.error(err));
+      let message = 'Failed to save project';
+      
+      if (error.response?.status === 401) {
+        message = 'Authentication failed. Please login again.';
+        logout();
+        navigate('/admin/login');
+      } else if (error.response?.status === 400) {
+        message = error.response?.data?.message || 'Invalid project data';
+      } else if (error.response?.status === 500) {
+        message = 'Server error. Please try again later.';
+      } else if (!error.response) {
+        message = 'Network error. Please check your connection.';
       } else {
-        toast.error(error.response?.data?.message || 'Failed to save project');
+        message = error.response?.data?.message || message;
       }
+      
+      toast.error(message, { duration: 3000 });
     } finally {
       setSubmitting(false);
     }
@@ -160,9 +312,6 @@ const ProjectsManagement = () => {
       description: project.description,
       category: project.category,
       location: project.location,
-      client: project.client || '',
-      startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
-      endDate: project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '',
       status: project.status,
       budget: project.budget || '',
       images: project.images || [],
@@ -186,27 +335,55 @@ const ProjectsManagement = () => {
     if (!window.confirm(`Are you sure you want to delete "${projectName}"? This action cannot be undone.`)) return;
 
     try {
+      const currentToken = localStorage.getItem('adminToken');
+      if (!currentToken) {
+        toast.error('Authentication required. Please login again.', { duration: 3000 });
+        logout();
+        navigate('/admin/login');
+        return;
+      }
+
       await axios.delete(`http://localhost:5000/api/projects/${projectId}`, {
-        headers: { Authorization: `Bearer ${admin.token}` }
+        headers: { Authorization: `Bearer ${currentToken}` }
       });
-      toast.success(`Project "${projectName}" deleted successfully`);
+      toast.success(`Project "${projectName}" deleted successfully`, { duration: 1500 });
       fetchProjects();
     } catch (error) {
       console.error('Error deleting project:', error);
-      toast.error('Failed to delete project');
+      if (error.response?.status === 401) {
+        toast.error('Authentication failed. Please login again.', { duration: 3000 });
+        logout();
+        navigate('/admin/login');
+      } else {
+        toast.error('Failed to delete project', { duration: 3000 });
+      }
     }
   };
 
   const toggleFeatured = async (projectId, currentStatus) => {
     try {
+      const currentToken = localStorage.getItem('adminToken');
+      if (!currentToken) {
+        toast.error('Authentication required. Please login again.', { duration: 3000 });
+        logout();
+        navigate('/admin/login');
+        return;
+      }
+
       await axios.patch(`http://localhost:5000/api/projects/${projectId}/toggle-featured`, {}, {
-        headers: { Authorization: `Bearer ${admin.token}` }
+        headers: { Authorization: `Bearer ${currentToken}` }
       });
-      toast.success(`Project ${!currentStatus ? 'featured' : 'unfeatured'} successfully`);
+      toast.success(`Project ${!currentStatus ? 'featured' : 'unfeatured'} successfully`, { duration: 1500 });
       fetchProjects();
     } catch (error) {
       console.error('Error toggling featured status:', error);
+      if (error.response?.status === 401) {
+        toast.error('Authentication failed. Please login again.', { duration: 3000 });
+        logout();
+        navigate('/admin/login');
+      } else {
       toast.error('Failed to update featured status');
+      }
     }
   };
 
@@ -216,9 +393,6 @@ const ProjectsManagement = () => {
       description: '',
       category: 'Residential',
       location: '',
-      client: '',
-      startDate: '',
-      endDate: '',
       status: 'Planning',
       budget: '',
       images: [],
@@ -295,8 +469,19 @@ const ProjectsManagement = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-4">
-              <Logo className="h-8 w-auto" clickable={false} />
               <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Projects Management</h1>
+              {connectionStatus === 'connected' && (
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-green-600 dark:text-green-400">Connected</span>
+              </div>
+              )}
+              {connectionStatus === 'disconnected' && (
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  <span className="text-sm text-red-600 dark:text-red-400">Disconnected</span>
+                </div>
+              )}
             </div>
             <button
               onClick={handleLogout}
@@ -304,7 +489,7 @@ const ProjectsManagement = () => {
             >
               Logout
             </button>
-          </div>
+        </div>
 
         {/* Filters and Search */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -361,12 +546,36 @@ const ProjectsManagement = () => {
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           {loading ? (
             <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading projects...</p>
+              <svg className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p className="text-gray-600 dark:text-gray-300">Loading projects...</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Please wait while we fetch your projects</p>
             </div>
           ) : projects.length === 0 ? (
             <div className="p-8 text-center">
-              <p className="text-gray-600">No projects found</p>
+              <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 mb-4">
+                <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No projects found</h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">Get started by creating your first project.</p>
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Add New Project
+                </button>
+                <button
+                  onClick={() => fetchProjects()}
+                  className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
+                >
+                  Retry
+                </button>
+              </div>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -548,34 +757,6 @@ const ProjectsManagement = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Client</label>
-                      <input
-                        type="text"
-                        value={formData.client}
-                        onChange={(e) => setFormData(prev => ({ ...prev, client: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Start Date *</label>
-                      <input
-                        type="date"
-                        required
-                        value={formData.startDate}
-                        onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">End Date</label>
-                      <input
-                        type="date"
-                        value={formData.endDate}
-                        onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      />
-                    </div>
-                    <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Status</label>
                       <select
                         value={formData.status}
@@ -612,7 +793,7 @@ const ProjectsManagement = () => {
                   </div>
 
                   {/* Features Section */}
-                  <div>
+                    <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Features</label>
                     <div className="space-y-2">
                       {formData.features.map((feature, index) => (
@@ -747,7 +928,7 @@ const ProjectsManagement = () => {
                       />
                       <label htmlFor="isFeatured" className="ml-2 block text-sm text-gray-700 dark:text-gray-200">
                         Featured Project
-                      </label>
+                    </label>
                     </div>
                     <div className="flex items-center">
                       <input
@@ -759,7 +940,7 @@ const ProjectsManagement = () => {
                       />
                       <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700 dark:text-gray-200">
                         Active Project
-                      </label>
+                    </label>
                     </div>
                   </div>
 

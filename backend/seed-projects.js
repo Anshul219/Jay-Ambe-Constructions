@@ -2,126 +2,37 @@ const mongoose = require('mongoose');
 const Project = require('./models/Project');
 const Admin = require('./models/Admin');
 
-// Sample projects data
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/jay-ambe-constructions', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 const sampleProjects = [
   {
-    name: 'Skyline Heights - Luxury Apartments',
-    description: 'Premium residential complex featuring 2BHK and 3BHK luxury apartments with modern amenities, swimming pool, gym, and 24/7 security. Located in the heart of Mumbai with excellent connectivity.',
-    category: 'Residential',
-    location: 'Bandra West, Mumbai, Maharashtra',
-    client: 'Skyline Developers Ltd.',
-    startDate: '2023-01-15',
-    endDate: '2024-03-20',
-    status: 'Completed',
+    name: "Green Valley Township",
+    description: "Eco-friendly residential township with sustainable design and green spaces. A modern community with 200+ units featuring smart building technology.",
+    category: "Residential",
+    location: "Nashik, Maharashtra",
+    client: "Green Valley Developers",
+    startDate: new Date("2023-06-01"),
+    endDate: new Date("2024-12-31"),
+    status: "Completed",
     budget: 85000000,
     images: [
       {
-        url: 'https://via.placeholder.com/800x600/4F46E5/FFFFFF?text=Skyline+Heights+Exterior',
-        caption: 'Exterior View',
+        url: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800",
+        caption: "Township Overview",
         isMain: true
-      },
-      {
-        url: 'https://via.placeholder.com/800x600/10B981/FFFFFF?text=Skyline+Heights+Pool',
-        caption: 'Swimming Pool Area'
-      },
-      {
-        url: 'https://via.placeholder.com/800x600/F59E0B/FFFFFF?text=Skyline+Heights+Lobby',
-        caption: 'Main Lobby'
       }
     ],
     features: [
-      'Swimming Pool',
-      'Fitness Center',
-      '24/7 Security',
-      'Parking Space',
-      'Garden Area',
-      'Children\'s Play Area'
-    ],
-    specifications: {
-      area: 25000,
-      floors: 15,
-      units: 120
-    },
-    highlights: [
-      'Premium Location',
-      'Modern Architecture',
-      'Green Building Certified',
-      'Smart Home Features'
-    ],
-    isFeatured: true,
-    isActive: true
-  },
-  {
-    name: 'Tech Park Complex',
-    description: 'State-of-the-art commercial complex designed for IT companies with modern office spaces, conference rooms, and collaborative areas. Features advanced technology infrastructure.',
-    category: 'Commercial',
-    location: 'Hinjewadi, Pune, Maharashtra',
-    client: 'TechCorp Solutions',
-    startDate: '2023-03-10',
-    endDate: '2024-01-15',
-    status: 'Completed',
-    budget: 120000000,
-    images: [
-      {
-        url: 'https://via.placeholder.com/800x600/8B5CF6/FFFFFF?text=Tech+Park+Complex',
-        caption: 'Main Building',
-        isMain: true
-      },
-      {
-        url: 'https://via.placeholder.com/800x600/EF4444/FFFFFF?text=Tech+Park+Office',
-        caption: 'Office Interior'
-      }
-    ],
-    features: [
-      'High-Speed Internet',
-      'Conference Rooms',
-      'Cafeteria',
-      'Parking Facility',
-      'Security System',
-      'Backup Power'
-    ],
-    specifications: {
-      area: 50000,
-      floors: 12,
-      units: 50
-    },
-    highlights: [
-      'IT-Ready Infrastructure',
-      'Energy Efficient',
-      'Central Location',
-      'Modern Design'
-    ],
-    isFeatured: true,
-    isActive: true
-  },
-  {
-    name: 'Green Valley Township',
-    description: 'Eco-friendly residential township with sustainable design principles. Features solar panels, rainwater harvesting, and extensive green spaces for a healthy living environment.',
-    category: 'Residential',
-    location: 'Nashik, Maharashtra',
-    client: 'Green Valley Developers',
-    startDate: '2023-06-01',
-    endDate: '2024-05-30',
-    status: 'Completed',
-    budget: 65000000,
-    images: [
-      {
-        url: 'https://via.placeholder.com/800x600/06B6D4/FFFFFF?text=Green+Valley+Township',
-        caption: 'Aerial View',
-        isMain: true
-      },
-      {
-        url: 'https://via.placeholder.com/800x600/10B981/FFFFFF?text=Green+Valley+Park',
-        caption: 'Central Park'
-      }
-    ],
-    features: [
-      'Solar Panels',
-      'Rainwater Harvesting',
-      'Waste Management',
-      'Community Garden',
-      'Walking Trails',
-      'Children\'s Park'
+      "200+ residential units",
+      "Eco-friendly design",
+      "Solar panel installation",
+      "Rainwater harvesting",
+      "Community gardens",
+      "Smart home automation"
     ],
     specifications: {
       area: 100000,
@@ -129,236 +40,217 @@ const sampleProjects = [
       units: 200
     },
     highlights: [
-      'Eco-Friendly Design',
-      'Sustainable Living',
-      'Green Building Certified',
-      'Community Focused'
+      "LEED certified",
+      "Sustainable design",
+      "Modern amenities",
+      "Green building technology"
     ],
     isFeatured: true,
     isActive: true
   },
   {
-    name: 'Industrial Manufacturing Hub',
-    description: 'Large-scale industrial facility designed for manufacturing operations with advanced machinery support, loading docks, and efficient workflow design.',
-    category: 'Industrial',
-    location: 'Aurangabad, Maharashtra',
-    client: 'Manufacturing Corp Ltd.',
-    startDate: '2023-02-20',
-    endDate: '2023-12-15',
-    status: 'Completed',
-    budget: 95000000,
+    name: "Skyline Heights Complex",
+    description: "Luxury residential apartments with state-of-the-art facilities and smart building technology. Premium living experience in the heart of Ahmedabad.",
+    category: "Residential",
+    location: "Ahmedabad, Gujarat",
+    client: "Skyline Developers",
+    startDate: new Date("2024-01-15"),
+    endDate: new Date("2025-06-30"),
+    status: "In Progress",
+    budget: 120000000,
     images: [
       {
-        url: 'https://via.placeholder.com/800x600/F97316/FFFFFF?text=Industrial+Hub',
-        caption: 'Main Facility',
+        url: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+        caption: "Construction Progress",
         isMain: true
-      },
-      {
-        url: 'https://via.placeholder.com/800x600/8B5CF6/FFFFFF?text=Industrial+Interior',
-        caption: 'Production Floor'
       }
     ],
     features: [
-      'Heavy Machinery Support',
-      'Loading Docks',
-      'Warehouse Space',
-      'Office Complex',
-      'Security System',
-      'Backup Power'
+      "150 luxury apartments",
+      "Swimming pool and gym",
+      "24/7 security",
+      "High-speed elevators",
+      "Smart home systems",
+      "Underground parking"
     ],
     specifications: {
-      area: 75000,
-      floors: 3,
-      units: 1
-    },
-    highlights: [
-      'Advanced Infrastructure',
-      'Efficient Workflow',
-      'Safety Compliant',
-      'Scalable Design'
-    ],
-    isFeatured: true,
-    isActive: true
-  },
-  {
-    name: 'Luxury Shopping Mall',
-    description: 'Premium shopping destination with international brands, entertainment zones, and fine dining restaurants. Features modern architecture and world-class amenities.',
-    category: 'Commercial',
-    location: 'Nagpur, Maharashtra',
-    client: 'Retail Ventures Ltd.',
-    startDate: '2023-04-05',
-    endDate: '2024-02-28',
-    status: 'Completed',
-    budget: 150000000,
-    images: [
-      {
-        url: 'https://via.placeholder.com/800x600/EC4899/FFFFFF?text=Luxury+Mall',
-        caption: 'Mall Exterior',
-        isMain: true
-      },
-      {
-        url: 'https://via.placeholder.com/800x600/8B5CF6/FFFFFF?text=Mall+Interior',
-        caption: 'Shopping Area'
-      }
-    ],
-    features: [
-      'International Brands',
-      'Food Court',
-      'Entertainment Zone',
-      'Parking Facility',
-      'Security System',
-      'Air Conditioning'
-    ],
-    specifications: {
-      area: 60000,
-      floors: 5,
+      area: 50000,
+      floors: 12,
       units: 150
     },
     highlights: [
-      'Premium Location',
-      'Modern Architecture',
-      'International Standards',
-      'Entertainment Hub'
+      "Premium location",
+      "Luxury amenities",
+      "Smart technology",
+      "High-quality construction"
     ],
     isFeatured: true,
     isActive: true
   },
   {
-    name: 'Premium Villa Complex',
-    description: 'Exclusive luxury villa development with custom-designed homes, private gardens, and premium finishes. Each villa features high-end amenities and personalized design.',
-    category: 'Residential',
-    location: 'Lonavala, Maharashtra',
-    client: 'Luxury Homes Pvt. Ltd.',
-    startDate: '2023-05-15',
-    endDate: '2024-04-10',
-    status: 'Completed',
-    budget: 75000000,
+    name: "Tech Park Commercial Hub",
+    description: "Modern commercial complex with office spaces, retail areas, and conference facilities. Perfect for businesses and startups.",
+    category: "Commercial",
+    location: "Mumbai, Maharashtra",
+    client: "Tech Park Ventures",
+    startDate: new Date("2024-03-01"),
+    endDate: new Date("2025-08-31"),
+    status: "In Progress",
+    budget: 200000000,
     images: [
       {
-        url: 'https://via.placeholder.com/800x600/F59E0B/FFFFFF?text=Premium+Villa',
-        caption: 'Villa Exterior',
+        url: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800",
+        caption: "Commercial Complex",
         isMain: true
-      },
-      {
-        url: 'https://via.placeholder.com/800x600/10B981/FFFFFF?text=Villa+Garden',
-        caption: 'Private Garden'
       }
     ],
     features: [
-      'Private Garden',
-      'Swimming Pool',
-      'Home Theater',
-      'Wine Cellar',
-      'Smart Home System',
-      'Security System'
+      "20 floors of office space",
+      "Retail shopping area",
+      "Conference facilities",
+      "Underground parking",
+      "Modern HVAC system",
+      "High-speed internet"
     ],
     specifications: {
-      area: 15000,
-      floors: 3,
-      units: 25
+      area: 75000,
+      floors: 20,
+      units: 100
     },
     highlights: [
-      'Luxury Living',
-      'Custom Design',
-      'Premium Location',
-      'Exclusive Community'
+      "Prime location",
+      "Modern design",
+      "Business-friendly",
+      "Advanced facilities"
     ],
     isFeatured: true,
     isActive: true
   },
   {
-    name: 'Metro Station Renovation',
-    description: 'Complete renovation and modernization of existing metro station infrastructure with improved accessibility, modern amenities, and enhanced passenger experience.',
-    category: 'Infrastructure',
-    location: 'Mumbai Central, Mumbai',
-    client: 'Mumbai Metro Rail Corporation',
-    startDate: '2023-08-01',
-    endDate: '2024-06-30',
-    status: 'In Progress',
-    budget: 45000000,
+    name: "Industrial Manufacturing Unit",
+    description: "Large-scale industrial facility with advanced manufacturing capabilities, warehouse space, and logistics support.",
+    category: "Industrial",
+    location: "Surat, Gujarat",
+    client: "ManufactureCorp Ltd",
+    startDate: new Date("2023-09-01"),
+    endDate: new Date("2024-11-30"),
+    status: "Completed",
+    budget: 95000000,
     images: [
       {
-        url: 'https://via.placeholder.com/800x600/6366F1/FFFFFF?text=Metro+Station',
-        caption: 'Station Exterior',
+        url: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800",
+        caption: "Manufacturing Unit",
         isMain: true
       }
     ],
     features: [
-      'Accessibility Features',
-      'Modern Signage',
-      'Security Systems',
-      'Passenger Information',
-      'Emergency Systems',
-      'Ventilation'
+      "50,000 sq ft manufacturing space",
+      "Advanced machinery installation",
+      "Warehouse facilities",
+      "Loading docks",
+      "Employee facilities",
+      "Security systems"
     ],
     specifications: {
-      area: 8000,
+      area: 50000,
       floors: 2,
       units: 1
     },
     highlights: [
-      'Public Infrastructure',
-      'Modern Design',
-      'Accessibility Focused',
-      'Safety Compliant'
+      "Advanced facilities",
+      "Efficient design",
+      "Quality construction",
+      "Timely delivery"
     ],
-    isFeatured: false,
+    isFeatured: true,
     isActive: true
   },
   {
-    name: 'Office Building Renovation',
-    description: 'Complete renovation of existing office building with modern interiors, improved energy efficiency, and updated technology infrastructure.',
-    category: 'Renovation',
-    location: 'Fort, Mumbai',
-    client: 'Corporate Solutions Ltd.',
-    startDate: '2024-01-10',
-    endDate: '2024-09-30',
-    status: 'In Progress',
+    name: "Heritage Building Renovation",
+    description: "Complete renovation and modernization of a heritage building while preserving its historical architecture and charm.",
+    category: "Renovation",
+    location: "Pune, Maharashtra",
+    client: "Heritage Trust",
+    startDate: new Date("2024-02-01"),
+    endDate: new Date("2024-10-31"),
+    status: "Completed",
     budget: 35000000,
     images: [
       {
-        url: 'https://via.placeholder.com/800x600/8B5CF6/FFFFFF?text=Office+Renovation',
-        caption: 'Renovation Progress',
+        url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800",
+        caption: "Renovated Building",
         isMain: true
       }
     ],
     features: [
-      'Modern Interiors',
-      'Energy Efficient Systems',
-      'Smart Building Technology',
-      'Improved Lighting',
-      'HVAC Systems',
-      'Security Upgrades'
+      "Heritage preservation",
+      "Modern amenities",
+      "Structural reinforcement",
+      "Period-appropriate materials",
+      "Energy efficiency upgrades",
+      "Accessibility improvements"
     ],
     specifications: {
-      area: 12000,
-      floors: 8,
+      area: 8000,
+      floors: 3,
       units: 1
     },
     highlights: [
-      'Modern Upgrade',
-      'Energy Efficient',
-      'Technology Integration',
-      'Improved Workspace'
+      "Heritage preservation",
+      "Modern functionality",
+      "Quality restoration",
+      "Historical significance"
     ],
-    isFeatured: false,
+    isFeatured: true,
+    isActive: true
+  },
+  {
+    name: "Smart City Infrastructure",
+    description: "Comprehensive infrastructure development including roads, utilities, and smart city technologies for sustainable urban development.",
+    category: "Infrastructure",
+    location: "Gandhinagar, Gujarat",
+    client: "Smart City Authority",
+    startDate: new Date("2024-01-01"),
+    endDate: new Date("2025-12-31"),
+    status: "In Progress",
+    budget: 300000000,
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800",
+        caption: "Infrastructure Development",
+        isMain: true
+      }
+    ],
+    features: [
+      "Smart traffic management",
+      "Solar street lighting",
+      "Waste management systems",
+      "Water treatment facilities",
+      "Digital infrastructure",
+      "Green spaces"
+    ],
+    specifications: {
+      area: 200000,
+      floors: 1,
+      units: 1
+    },
+    highlights: [
+      "Smart city technology",
+      "Sustainable design",
+      "Government project",
+      "Large scale development"
+    ],
+    isFeatured: true,
     isActive: true
   }
 ];
 
 async function seedProjects() {
   try {
-    // Connect to MongoDB
-    await mongoose.connect('mongodb://localhost:27017/jay-ambe-constructions', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
-    console.log('Connected to MongoDB');
-
-    // Get the first admin user to use as createdBy
-    const admin = await Admin.findOne();
+    // Get the admin user
+    const admin = await Admin.findOne({ email: 'admin@jayambeconstructions.com' });
     if (!admin) {
-      console.error('No admin user found. Please run the seed script first.');
+      console.error('Admin user not found. Please run seedAdmin.js first.');
       process.exit(1);
     }
 
@@ -367,27 +259,28 @@ async function seedProjects() {
     console.log('Cleared existing projects');
 
     // Add sample projects
-    const projectsWithAdmin = sampleProjects.map(project => ({
-      ...project,
-      createdBy: admin._id,
-      updatedBy: admin._id
-    }));
+    for (const projectData of sampleProjects) {
+      const project = new Project({
+        ...projectData,
+        createdBy: admin._id,
+        updatedBy: admin._id
+      });
+      await project.save();
+    }
 
-    await Project.insertMany(projectsWithAdmin);
-    console.log(`Successfully added ${sampleProjects.length} sample projects`);
-
-    // Display added projects
-    const addedProjects = await Project.find().populate('createdBy', 'username');
-    console.log('\nAdded Projects:');
-    addedProjects.forEach(project => {
-      console.log(`- ${project.name} (${project.status})`);
+    console.log('✅ Sample projects created successfully!');
+    console.log(`📊 Created ${sampleProjects.length} projects`);
+    
+    // Display created projects
+    const projects = await Project.find().populate('createdBy', 'username');
+    projects.forEach((project, index) => {
+      console.log(`${index + 1}. ${project.name} - ${project.status}`);
     });
 
-    console.log('\n✅ Sample projects seeded successfully!');
-    process.exit(0);
   } catch (error) {
-    console.error('Error seeding projects:', error);
-    process.exit(1);
+    console.error('❌ Error seeding projects:', error);
+  } finally {
+    mongoose.connection.close();
   }
 }
 

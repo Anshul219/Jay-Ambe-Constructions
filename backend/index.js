@@ -16,14 +16,29 @@ const projectRoutes = require('./routes/projects');
 const serviceRoutes = require('./routes/services');
 const journeyRoutes = require('./routes/journey');
 const contactRoutes = require('./routes/contacts');
+const newsletterRoutes = require('./routes/newsletter');
 
 const app = express();
 
 // Security middleware
 app.use(cors({
   origin: config.security.corsOrigins,
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
+// Serve static files (uploaded images)
+app.use('/uploads', express.static('uploads'));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -35,9 +50,6 @@ app.use(requestLogger);
 // Rate limiting (commented out for now)
 // app.use('/api/', apiLimiter);
 // app.use('/api/auth', authLimiter);
-
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Connect to MongoDB
 mongoose.connect(config.database.uri, config.database.options)
@@ -51,6 +63,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/journey', journeyRoutes);
 app.use('/api/contacts', contactRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 // Health check
 app.get('/', (req, res) => {

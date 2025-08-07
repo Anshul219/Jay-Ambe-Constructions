@@ -65,133 +65,144 @@ const Projects = () => {
 
   const fetchProjects = async () => {
     try {
-      // This will fetch all projects regardless of active status
-      const response = await fetch('http://localhost:5000/api/projects?limit=50&active=all');
+      setLoading(true);
+      console.log('Fetching projects...');
+      
+      const response = await fetch('http://localhost:5000/api/projects?limit=50&active=true');
       const data = await response.json();
       
-      if (data.success) {
+      if (data.success && data.data) {
+        console.log('Fetched projects:', data.data.length);
         setProjects(data.data);
       } else {
-        // Fallback data
+        console.log('No projects found, using fallback data');
+        // Fallback data with real project information
         setProjects([
           {
             _id: '1',
-            name: 'Skyline Heights',
-            description: 'Luxury residential apartments with modern amenities and world-class facilities',
-            category: 'Residential',
-            status: 'Completed',
-            location: 'Mumbai, Maharashtra',
-            client: 'Skyline Developers',
-            startDate: '2023-01-15',
-            endDate: '2024-01-15',
-            budget: 25000000,
-            specifications: { area: 25000, floors: 15, units: 120 },
-            images: [
-              { url: 'https://via.placeholder.com/600x400/4F46E5/FFFFFF?text=Skyline+Heights+1', caption: 'Main View' },
-              { url: 'https://via.placeholder.com/600x400/4F46E5/FFFFFF?text=Skyline+Heights+2', caption: 'Interior' }
-            ],
-            features: ['Swimming Pool', 'Gym', 'Garden', 'Security System'],
-            highlights: ['Premium Location', 'Modern Design', 'Quality Construction']
-          },
-          {
-            _id: '2',
-            name: 'Tech Park Complex',
-            description: 'Modern office complex with state-of-the-art facilities and smart building technology',
-            category: 'Commercial',
-            status: 'Completed',
-            location: 'Pune, Maharashtra',
-            client: 'TechCorp Solutions',
-            startDate: '2023-03-20',
-            endDate: '2023-12-20',
-            budget: 45000000,
-            specifications: { area: 50000, floors: 12, units: 50 },
-            images: [
-              { url: 'https://via.placeholder.com/600x400/10B981/FFFFFF?text=Tech+Park+1', caption: 'Main Building' },
-              { url: 'https://via.placeholder.com/600x400/10B981/FFFFFF?text=Tech+Park+2', caption: 'Office Space' }
-            ],
-            features: ['Smart Building System', 'Conference Rooms', 'Cafeteria', 'Parking'],
-            highlights: ['LEED Certified', 'Smart Technology', 'Prime Location']
-          },
-          {
-            _id: '3',
             name: 'Green Valley Township',
-            description: 'Eco-friendly residential township with sustainable design and green spaces',
+            description: 'Eco-friendly residential township with sustainable design and green spaces. A modern community with 200+ units featuring smart building technology.',
             category: 'Residential',
             status: 'Completed',
             location: 'Nashik, Maharashtra',
-            client: 'Green Valley Developers',
-            startDate: '2022-08-10',
-            endDate: '2023-11-10',
-            budget: 80000000,
+            budget: 85000000,
             specifications: { area: 100000, floors: 8, units: 200 },
             images: [
-              { url: 'https://via.placeholder.com/600x400/F59E0B/FFFFFF?text=Green+Valley+1', caption: 'Aerial View' },
-              { url: 'https://via.placeholder.com/600x400/F59E0B/FFFFFF?text=Green+Valley+2', caption: 'Garden Area' }
+              { url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800', caption: 'Township Overview' }
             ],
-            features: ['Solar Panels', 'Rainwater Harvesting', 'Community Garden', 'Walking Trails'],
-            highlights: ['Eco-Friendly', 'Sustainable Design', 'Green Certification']
+            features: ['200+ residential units', 'Eco-friendly design', 'Solar panel installation', 'Rainwater harvesting', 'Community gardens', 'Smart home automation'],
+            highlights: ['LEED certified', 'Sustainable design', 'Modern amenities', 'Green building technology'],
+            isFeatured: true
+          },
+          {
+            _id: '2',
+            name: 'Skyline Heights Complex',
+            description: 'Luxury residential apartments with state-of-the-art facilities and smart building technology. Premium living experience in the heart of Ahmedabad.',
+            category: 'Residential',
+            status: 'In Progress',
+            location: 'Ahmedabad, Gujarat',
+            budget: 120000000,
+            specifications: { area: 50000, floors: 12, units: 150 },
+            images: [
+              { url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800', caption: 'Construction Progress' }
+            ],
+            features: ['150 luxury apartments', 'Swimming pool and gym', '24/7 security', 'High-speed elevators', 'Smart home systems', 'Underground parking'],
+            highlights: ['Premium location', 'Luxury amenities', 'Smart technology', 'High-quality construction'],
+            isFeatured: true
+          },
+          {
+            _id: '3',
+            name: 'Tech Park Commercial Hub',
+            description: 'Modern commercial complex with office spaces, retail areas, and conference facilities. Perfect for businesses and startups.',
+            category: 'Commercial',
+            status: 'In Progress',
+            location: 'Mumbai, Maharashtra',
+            budget: 200000000,
+            specifications: { area: 75000, floors: 20, units: 100 },
+            images: [
+              { url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800', caption: 'Commercial Complex' }
+            ],
+            features: ['20 floors of office space', 'Retail shopping area', 'Conference facilities', 'Underground parking', 'Modern HVAC system', 'High-speed internet'],
+            highlights: ['Prime location', 'Modern design', 'Business-friendly', 'Advanced facilities'],
+            isFeatured: true
           },
           {
             _id: '4',
-            name: 'Industrial Hub',
-            description: 'Large-scale industrial facility with advanced manufacturing capabilities',
+            name: 'Industrial Manufacturing Unit',
+            description: 'Large-scale industrial facility with advanced manufacturing capabilities, warehouse space, and logistics support.',
             category: 'Industrial',
-            status: 'In Progress',
-            location: 'Aurangabad, Maharashtra',
-            client: 'Industrial Corp',
-            startDate: '2024-01-05',
-            endDate: '2024-12-05',
-            budget: 120000000,
-            specifications: { area: 75000, floors: 3, units: 1 },
+            status: 'Completed',
+            location: 'Surat, Gujarat',
+            budget: 95000000,
+            specifications: { area: 50000, floors: 2, units: 1 },
             images: [
-              { url: 'https://via.placeholder.com/600x400/8B5CF6/FFFFFF?text=Industrial+Hub+1', caption: 'Factory Building' },
-              { url: 'https://via.placeholder.com/600x400/8B5CF6/FFFFFF?text=Industrial+Hub+2', caption: 'Production Line' }
+              { url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800', caption: 'Manufacturing Unit' }
             ],
-            features: ['Advanced Machinery', 'Quality Control Lab', 'Warehouse', 'Loading Docks'],
-            highlights: ['State-of-the-art Equipment', 'Quality Standards', 'Efficient Layout']
+            features: ['50,000 sq ft manufacturing space', 'Advanced machinery installation', 'Warehouse facilities', 'Loading docks', 'Employee facilities', 'Security systems'],
+            highlights: ['Advanced facilities', 'Efficient design', 'Quality construction', 'Timely delivery'],
+            isFeatured: true
           },
           {
             _id: '5',
-            name: 'Shopping Mall',
-            description: 'Modern shopping mall with premium retail spaces and entertainment zones',
-            category: 'Commercial',
+            name: 'Heritage Building Renovation',
+            description: 'Complete renovation and modernization of a heritage building while preserving its historical architecture and charm.',
+            category: 'Renovation',
             status: 'Completed',
-            location: 'Nagpur, Maharashtra',
-            client: 'Retail Ventures',
-            startDate: '2023-05-15',
-            endDate: '2023-09-15',
+            location: 'Pune, Maharashtra',
             budget: 35000000,
-            specifications: { area: 60000, floors: 4, units: 80 },
+            specifications: { area: 8000, floors: 3, units: 1 },
             images: [
-              { url: 'https://via.placeholder.com/600x400/EF4444/FFFFFF?text=Shopping+Mall+1', caption: 'Main Entrance' },
-              { url: 'https://via.placeholder.com/600x400/EF4444/FFFFFF?text=Shopping+Mall+2', caption: 'Retail Space' }
+              { url: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800', caption: 'Renovated Building' }
             ],
-            features: ['Food Court', 'Entertainment Zone', 'Parking', 'Security System'],
-            highlights: ['Premium Location', 'Modern Design', 'High Footfall']
+            features: ['Heritage preservation', 'Modern amenities', 'Structural reinforcement', 'Period-appropriate materials', 'Energy efficiency upgrades', 'Accessibility improvements'],
+            highlights: ['Heritage preservation', 'Modern functionality', 'Quality restoration', 'Historical significance'],
+            isFeatured: true
           },
           {
             _id: '6',
-            name: 'Luxury Villa',
-            description: 'Exclusive luxury villa with premium finishes and custom design',
-            category: 'Residential',
-            status: 'Completed',
-            location: 'Lonavala, Maharashtra',
-            client: 'Private Client',
-            startDate: '2023-06-30',
-            endDate: '2023-08-30',
-            budget: 15000000,
-            specifications: { area: 15000, floors: 2, units: 1 },
+            name: 'Smart City Infrastructure',
+            description: 'Comprehensive infrastructure development including roads, utilities, and smart city technologies for sustainable urban development.',
+            category: 'Infrastructure',
+            status: 'In Progress',
+            location: 'Gandhinagar, Gujarat',
+            budget: 300000000,
+            specifications: { area: 200000, floors: 1, units: 1 },
             images: [
-              { url: 'https://via.placeholder.com/600x400/06B6D4/FFFFFF?text=Luxury+Villa+1', caption: 'Front View' },
-              { url: 'https://via.placeholder.com/600x400/06B6D4/FFFFFF?text=Luxury+Villa+2', caption: 'Living Room' }
+              { url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800', caption: 'Infrastructure Development' }
             ],
-            features: ['Swimming Pool', 'Home Theater', 'Wine Cellar', 'Smart Home System'],
-            highlights: ['Luxury Finishes', 'Custom Design', 'Premium Location']
+            features: ['Smart traffic management', 'Solar street lighting', 'Waste management systems', 'Water treatment facilities', 'Digital infrastructure', 'Green spaces'],
+            highlights: ['Smart city technology', 'Sustainable design', 'Government project', 'Large scale development'],
+            isFeatured: true
           }
         ]);
       }
     } catch (error) {
       console.error('Error fetching projects:', error);
+      // Use fallback data on error
+      setProjects([
+        {
+          _id: '1',
+          name: 'Green Valley Township',
+          description: 'Eco-friendly residential township with sustainable design and green spaces.',
+          category: 'Residential',
+          status: 'Completed',
+          location: 'Nashik, Maharashtra',
+          specifications: { area: 100000 },
+          images: [{ url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800' }],
+          isFeatured: true
+        },
+        {
+          _id: '2',
+          name: 'Skyline Heights Complex',
+          description: 'Luxury residential apartments with modern amenities.',
+          category: 'Residential',
+          status: 'In Progress',
+          location: 'Ahmedabad, Gujarat',
+          specifications: { area: 50000 },
+          images: [{ url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800' }],
+          isFeatured: true
+        }
+      ]);
     } finally {
       setLoading(false);
     }
@@ -299,9 +310,14 @@ const Projects = () => {
               {/* Project Image */}
               <div className="relative h-64 bg-gray-200 dark:bg-gray-700">
                 <img
-                  src={project.images?.[0]?.url}
+                  src={project.images && project.images.length > 0 
+                    ? project.images[0].url.startsWith('http') 
+                      ? project.images[0].url 
+                      : `http://localhost:5000${project.images[0].url}`
+                    : `https://via.placeholder.com/600x400/4F46E5/FFFFFF?text=${encodeURIComponent(project.name)}`
+                  }
                   alt={project.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-48 object-cover rounded-t-lg"
                   onError={(e) => {
                     e.target.src = `https://via.placeholder.com/600x400/4F46E5/FFFFFF?text=${encodeURIComponent(project.name)}`;
                   }}
@@ -309,6 +325,11 @@ const Projects = () => {
                 <div className="absolute top-4 right-4">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
                     {project.status}
+                  </span>
+                </div>
+                <div className="absolute top-4 left-4">
+                  <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
+                    {project.category}
                   </span>
                 </div>
               </div>

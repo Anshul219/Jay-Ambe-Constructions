@@ -1,8 +1,75 @@
 const express = require('express');
 const Project = require('../models/Project');
 const { auth } = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
+
+// Configure multer for image uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = 'uploads/projects';
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: function (req, file, cb) {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'));
+    }
+  }
+});
+
+// Upload images route
+router.post('/upload-images', auth, upload.array('images', 10), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No images uploaded'
+      });
+    }
+
+    const uploadedImages = req.files.map((file, index) => ({
+      url: `/uploads/projects/${file.filename}`,
+      caption: req.body.captions ? req.body.captions[index] || file.originalname : file.originalname,
+      isMain: index === 0
+    }));
+
+    res.json({
+      success: true,
+      message: `${uploadedImages.length} image(s) uploaded successfully`,
+      data: uploadedImages
+    });
+
+  } catch (error) {
+    console.error('Image upload error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload images'
+    });
+  }
+});
 
 // Get all projects (with filtering and pagination)
 router.get('/', async (req, res) => {
@@ -16,6 +83,17 @@ router.get('/', async (req, res) => {
       featured,
       active = true  // This defaults to only showing active projects
     } = req.query;
+
+    // Validate pagination parameters
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    
+    if (pageNum < 1 || limitNum < 1 || limitNum > 100) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid pagination parameters' 
+      });
+    }
 
     const query = {};
 
@@ -45,8 +123,8 @@ router.get('/', async (req, res) => {
     }
 
     const options = {
-      page: parseInt(page),
-      limit: parseInt(limit),
+      page: pageNum,
+      limit: limitNum,
       sort: { createdAt: -1 },
       populate: [
         { path: 'createdBy', select: 'username' },
@@ -70,7 +148,10 @@ router.get('/', async (req, res) => {
 
   } catch (error) {
     console.error('Get projects error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to fetch projects. Please try again.' 
+    });
   }
 });
 
@@ -139,10 +220,10 @@ router.post('/', auth, async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!name || !description || !category || !location || !startDate) {
+    if (!name || !description || !category || !location) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Name, description, category, location, and start date are required' 
+        message: 'Name, description, category, and location are required' 
       });
     }
 
